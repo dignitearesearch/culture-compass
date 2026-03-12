@@ -85,22 +85,22 @@ const Index = () => {
         {step === "intro" && (
           <div className="text-center max-w-xl mx-auto animate-fade-in" style={{ opacity: 0 }}>
             <p className="text-sm font-body text-secondary font-semibold tracking-widest uppercase mb-4">
-              Self-Assessment Tool
+              A Self-Assessment Tool by Dignitea
             </p>
             <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
-              Discover Your
+              Mapping Your
               <br />
               Cultural Profile
             </h2>
             <p className="text-muted-foreground font-body text-lg leading-relaxed mb-4">
               Based on Erin Meyer's{" "}
               <em className="text-foreground">The Culture Map</em>, this tool
-              helps you understand where you fall on 8 critical cultural
+              helps you reflect where you fall on 8 cultural
               scales — and how to adapt when working across cultures.
             </p>
             <p className="text-muted-foreground font-body text-sm mb-10">
-              You'll place yourself on each scale, reflect on workplace
-              scenarios, and receive a personalized report.
+              You'll place yourself on each scale, think through workplace
+              scenarios, and receive a personalised report.
             </p>
             <Button
               onClick={() => setStep("scales")}
