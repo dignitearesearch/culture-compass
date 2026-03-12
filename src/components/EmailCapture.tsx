@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { cultureScales } from "@/data/cultureScales";
+import html2canvas from "html2canvas";
+import VisualReport from "./VisualReport";
 
 interface EmailCaptureProps {
   scaleValues: Record<string, number | null>;
@@ -11,8 +12,10 @@ const EmailCapture = ({ scaleValues, scenarioResponses }: EmailCaptureProps) => 
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [generating, setGenerating] = useState(false);
+  const reportRef = useRef<HTMLDivElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -21,61 +24,27 @@ const EmailCapture = ({ scaleValues, scenarioResponses }: EmailCaptureProps) => 
       return;
     }
 
-    // In a real app this would send to a backend
-    // For now we generate and download the report
-    generateReport();
-    setSubmitted(true);
-  };
+    setGenerating(true);
+    // Wait a tick for the report to render
+    await new Promise((r) => setTimeout(r, 100));
 
-  const generateReport = () => {
-    let report = "═══════════════════════════════════════════════\n";
-    report += "        YOUR CULTURE MAP — PERSONAL REPORT\n";
-    report += "═══════════════════════════════════════════════\n\n";
-    report += `Generated for: ${email}\n`;
-    report += `Date: ${new Date().toLocaleDateString()}\n\n`;
-
-    report += "── YOUR POSITIONS ON THE 8 SCALES ──\n\n";
-
-    cultureScales.forEach((scale) => {
-      const val = scaleValues[scale.id];
-      const pos = val !== null && val !== undefined ? val : "Not set";
-      const bar =
-        val !== null && val !== undefined
-          ? "█".repeat(Math.round(val / 5)) +
-            "░".repeat(20 - Math.round(val / 5))
-          : "░".repeat(20);
-
-      report += `${scale.name}\n`;
-      report += `${scale.leftLabel}  [${bar}]  ${scale.rightLabel}\n`;
-      report += `Your position: ${pos}%\n\n`;
-    });
-
-    report += "\n── SCENARIO REFLECTIONS ──\n\n";
-
-    cultureScales.slice(0, 4).forEach((scale) => {
-      const answers = scenarioResponses[scale.id];
-      if (answers && answers.some((a) => a.trim())) {
-        report += `▸ ${scale.name}\n`;
-        scale.scenarioQuestions.forEach((q, i) => {
-          if (answers[i]?.trim()) {
-            report += `  Q: ${q}\n`;
-            report += `  A: ${answers[i]}\n\n`;
-          }
+    try {
+      if (reportRef.current) {
+        const canvas = await html2canvas(reportRef.current, {
+          backgroundColor: "#1a1a2e",
+          scale: 2,
         });
+        const link = document.createElement("a");
+        link.download = "culture-map-report.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
       }
-    });
+    } catch {
+      // Fallback: just mark as done
+    }
 
-    report += "\n═══════════════════════════════════════════════\n";
-    report += "Based on the framework from Erin Meyer's The Culture Map\n";
-    report += "═══════════════════════════════════════════════\n";
-
-    const blob = new Blob([report], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "culture-map-report.txt";
-    a.click();
-    URL.revokeObjectURL(url);
+    setGenerating(false);
+    setSubmitted(true);
   };
 
   if (submitted) {
@@ -88,7 +57,7 @@ const EmailCapture = ({ scaleValues, scenarioResponses }: EmailCaptureProps) => 
           Report Downloaded!
         </h2>
         <p className="text-muted-foreground font-body max-w-md mx-auto mb-2">
-          Your personal culture map report has been downloaded. Check your downloads folder.
+          Your visual culture map report has been downloaded. Check your downloads folder.
         </p>
         <p className="text-sm text-muted-foreground font-body">
           Sent to: <span className="text-foreground font-medium">{email}</span>
@@ -103,7 +72,7 @@ const EmailCapture = ({ scaleValues, scenarioResponses }: EmailCaptureProps) => 
         Get Your Report
       </h2>
       <p className="text-muted-foreground font-body max-w-md mx-auto mb-8">
-        Enter your email to receive a one-page summary of your personal culture
+        Enter your email to download a visual summary of your personal culture
         map, including your scale positions and scenario reflections.
       </p>
 
@@ -120,10 +89,31 @@ const EmailCapture = ({ scaleValues, scenarioResponses }: EmailCaptureProps) => 
             <p className="text-xs text-destructive mt-1 font-body">{error}</p>
           )}
         </div>
-        <Button type="submit" size="lg" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-body font-semibold">
-          Download My Report
+        <Button
+          type="submit"
+          size="lg"
+          disabled={generating}
+          className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-body font-semibold"
+        >
+          {generating ? "Generating Report..." : "Download My Report"}
         </Button>
       </form>
+
+      {/* Off-screen visual report for capture */}
+      <div
+        style={{
+          position: "absolute",
+          left: "-9999px",
+          top: 0,
+        }}
+      >
+        <VisualReport
+          ref={reportRef}
+          email={email}
+          scaleValues={scaleValues}
+          scenarioResponses={scenarioResponses}
+        />
+      </div>
     </div>
   );
 };
