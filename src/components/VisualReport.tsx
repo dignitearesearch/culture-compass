@@ -13,11 +13,12 @@ const VisualReport = forwardRef<HTMLDivElement, VisualReportProps>(
       <div
         ref={ref}
         style={{
-          width: 800,
+          width: 900,
           padding: 48,
           backgroundColor: "#1a1a2e",
           color: "#e8e0d4",
           fontFamily: "'Source Sans 3', sans-serif",
+          boxSizing: "border-box", // Essential to keep padding inside the 900px width
         }}
       >
         {/* Header */}
@@ -124,8 +125,8 @@ const VisualReport = forwardRef<HTMLDivElement, VisualReportProps>(
                 <div
                   style={{
                     position: "relative",
-                    height: 14,
-                    marginTop: 2,
+                    height: 18,
+                    marginTop: 4,
                   }}
                 >
                   {scale.countries.map((c) => (
@@ -135,7 +136,7 @@ const VisualReport = forwardRef<HTMLDivElement, VisualReportProps>(
                         position: "absolute",
                         left: `${c.position}%`,
                         transform: "translateX(-50%)",
-                        fontSize: 8,
+                        fontSize: 10,
                         color: "#6b6560",
                         whiteSpace: "nowrap",
                       }}
@@ -174,7 +175,7 @@ const VisualReport = forwardRef<HTMLDivElement, VisualReportProps>(
                 <div key={scale.id} style={{ marginBottom: 16 }}>
                   <p
                     style={{
-                      fontSize: 13,
+                      fontSize: 16,
                       fontWeight: 600,
                       color: "#c8a45e",
                       marginBottom: 6,
@@ -186,10 +187,10 @@ const VisualReport = forwardRef<HTMLDivElement, VisualReportProps>(
                     if (!answers[i]?.trim()) return null;
                     return (
                       <div key={i} style={{ marginBottom: 8, paddingLeft: 12 }}>
-                        <p style={{ fontSize: 11, color: "#9a938a", marginBottom: 2 }}>
+                        <p style={{ fontSize: 13, color: "#9a938a", marginBottom: 2 }}>
                           {q}
                         </p>
-                        <p style={{ fontSize: 12, color: "#e8e0d4" }}>
+                        <p style={{ fontSize: 15, color: "#e8e0d4" }}>
                           {answers[i]}
                         </p>
                       </div>
