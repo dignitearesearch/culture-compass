@@ -37,7 +37,7 @@ const VisualReport = forwardRef<HTMLDivElement, VisualReportProps>(
             Personal Profile Report
           </p>
           <p style={{ fontSize: 12, color: "#9a938a" }}>
-            {email} · {new Date().toLocaleDateString()}
+            {new Date().toLocaleDateString()}
           </p>
         </div>
 
