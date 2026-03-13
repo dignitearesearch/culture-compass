@@ -13,12 +13,14 @@ const VisualReport = forwardRef<HTMLDivElement, VisualReportProps>(
       <div
         ref={ref}
         style={{
-          width: 1200,
-          padding: 48,
+          width: 800,
+          padding: 48px 60px,
           backgroundColor: "#1a1a2e",
           color: "#e8e0d4",
           fontFamily: "'Source Sans 3', sans-serif",
-          boxSizing: "border-box", // Essential to keep padding inside the  width
+          boxSizing: "border-box", // added
+          display: "flex", // added
+          flexDirection: "column", // added
         }}
       >
         {/* Header */}
@@ -190,7 +192,7 @@ const VisualReport = forwardRef<HTMLDivElement, VisualReportProps>(
                         <p style={{ fontSize: 13, color: "#9a938a", marginBottom: 2 }}>
                           {q}
                         </p>
-                        <p style={{ fontSize: 15, color: "#e8e0d4" }}>
+                        <p style={{ fontSize: 14, color: "#e8e0d4" }}>
                           {answers[i]}
                         </p>
                       </div>
