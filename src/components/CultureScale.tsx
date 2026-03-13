@@ -82,6 +82,24 @@ const CultureScale = ({ scale, value, onChange, index }: CultureScaleProps) => {
         </span>
       </div>
 
+      {/* Country names above track */}
+      {showCountries && (
+        <div className="relative h-4 mb-1">
+          {scale.countries.map((c) => (
+            <span
+              key={c.country}
+              className="absolute text-[9px] font-body text-muted-foreground whitespace-nowrap"
+              style={{
+                left: `${c.position}%`,
+                transform: "translateX(-50%)",
+              }}
+            >
+              {c.country}
+            </span>
+          ))}
+        </div>
+      )}
+
       {/* Track */}
       <div
         ref={trackRef}
