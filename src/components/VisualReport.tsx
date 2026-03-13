@@ -14,17 +14,10 @@ const VisualReport = forwardRef<HTMLDivElement, VisualReportProps>(
         ref={ref}
         style={{
           width: "800px",
-          minwidth:"800px", //added
           padding: "48px 60px",
           backgroundColor: "#1a1a2e",
           color: "#e8e0d4",
           fontFamily: "'Source Sans 3', sans-serif",
-          boxSizing: "border-box", // added
-          display: "flex", // added
-          flexDirection: "column", // added
-          position: "relative", // added
-          maxWidth: "none", // added
-          flexShrink: 0, // added
         }}
       >
         {/* Header */}
