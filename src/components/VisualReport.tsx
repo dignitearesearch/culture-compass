@@ -14,7 +14,7 @@ const VisualReport = forwardRef<HTMLDivElement, VisualReportProps>(
         ref={ref}
         style={{
           width: 800,
-          padding: 48px 60px,
+          padding: "48px 60px",
           backgroundColor: "#1a1a2e",
           color: "#e8e0d4",
           fontFamily: "'Source Sans 3', sans-serif",
