@@ -110,19 +110,7 @@ const CultureScale = ({ scale, value, onChange, index }: CultureScaleProps) => {
         {/* Country dots */}
         {showCountries &&
           scale.countries.map((c) => (
-            <div key={c.country} className="group">
-              <div className="country-dot" style={{ left: `${c.position}%` }} />
-              <span
-                className="absolute text-[10px] font-body text-muted-foreground whitespace-nowrap pointer-events-none"
-                style={{
-                  left: `${c.position}%`,
-                  top: "-18px",
-                  transform: "translateX(-50%)",
-                }}
-              >
-                {c.country}
-              </span>
-            </div>
+            <div key={c.country} className="country-dot" style={{ left: `${c.position}%` }} />
           ))}
 
         {/* User marker */}
