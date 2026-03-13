@@ -52,8 +52,8 @@ const EmailCapture = ({ scaleValues, scenarioResponses }: EmailCaptureProps) => 
       </div>
 
       {/* Visible report */}
-      <div className="flex justify-center">
-        <div className="rounded-lg overflow-hidden shadow-lg border border-border">
+      <div className="flex justify-center w-full overflow-x-auto px-2">
+        <div className="rounded-lg overflow-hidden shadow-lg border border-border inline-block min-w-[800px]">
           <VisualReport
             ref={reportRef}
             email=""
