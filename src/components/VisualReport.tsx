@@ -13,12 +13,12 @@ const VisualReport = forwardRef<HTMLDivElement, VisualReportProps>(
       <div
         ref={ref}
         style={{
-          width: 900,
+          width: 1200,
           padding: 48,
           backgroundColor: "#1a1a2e",
           color: "#e8e0d4",
           fontFamily: "'Source Sans 3', sans-serif",
-          boxSizing: "border-box", // Essential to keep padding inside the 900px width
+          boxSizing: "border-box", // Essential to keep padding inside the  width
         }}
       >
         {/* Header */}
