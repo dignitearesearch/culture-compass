@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cultureScales } from "@/data/cultureScales";
-import CultureScale from "@/components/CultureScale";
-import ScenarioStep from "@/components/ScenarioStep";
+import ScaleWithScenarios from "@/components/ScaleWithScenarios";
 import EmailCapture from "@/components/EmailCapture";
 
-type Step = "intro" | "scales" | "scenarios" | "email";
-
 const Index = () => {
-  const [step, setStep] = useState<Step>("intro");
+  const [step, setStep] = useState<"intro" | "scale" | "report">("intro");
+  const [currentScaleIdx, setCurrentScaleIdx] = useState(0);
   const [scaleValues, setScaleValues] = useState<Record<string, number | null>>(
     Object.fromEntries(cultureScales.map((s) => [s.id, null]))
   );
@@ -16,24 +14,36 @@ const Index = () => {
     Record<string, string[]>
   >({});
 
-  const completedScales = Object.values(scaleValues).filter(
-    (v) => v !== null
-  ).length;
+  const currentScale = cultureScales[currentScaleIdx];
 
-  const handleScaleChange = (id: string, value: number) => {
-    setScaleValues((prev) => ({ ...prev, [id]: value }));
+  const handleScaleChange = (value: number) => {
+    setScaleValues((prev) => ({ ...prev, [currentScale.id]: value }));
   };
 
-  const handleScenarioChange = (
-    scaleId: string,
-    qIdx: number,
-    value: string
-  ) => {
+  const handleScenarioChange = (qIdx: number, value: string) => {
     setScenarioResponses((prev) => {
-      const arr = [...(prev[scaleId] || [])];
+      const arr = [...(prev[currentScale.id] || [])];
       arr[qIdx] = value;
-      return { ...prev, [scaleId]: arr };
+      return { ...prev, [currentScale.id]: arr };
     });
+  };
+
+  const canProceed = scaleValues[currentScale?.id] !== null;
+
+  const handleNext = () => {
+    if (currentScaleIdx < cultureScales.length - 1) {
+      setCurrentScaleIdx((i) => i + 1);
+    } else {
+      setStep("report");
+    }
+  };
+
+  const handleBack = () => {
+    if (currentScaleIdx > 0) {
+      setCurrentScaleIdx((i) => i - 1);
+    } else {
+      setStep("intro");
+    }
   };
 
   return (
@@ -44,37 +54,20 @@ const Index = () => {
           <h1 className="font-display text-lg font-bold text-foreground tracking-tight">
             The Culture Map
           </h1>
-          {step !== "intro" && (
-            <div className="flex items-center gap-2 text-xs font-body text-muted-foreground">
-              <span
-                className={
-                  step === "scales"
-                    ? "text-secondary font-semibold"
-                    : ""
-                }
-              >
-                Map
-              </span>
-              <span>·</span>
-              <span
-                className={
-                  step === "scenarios"
-                    ? "text-secondary font-semibold"
-                    : ""
-                }
-              >
-                Reflect
-              </span>
-              <span>·</span>
-              <span
-                className={
-                  step === "email"
-                    ? "text-secondary font-semibold"
-                    : ""
-                }
-              >
-                Report
-              </span>
+          {step === "scale" && (
+            <div className="flex items-center gap-1.5">
+              {cultureScales.map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    i < currentScaleIdx
+                      ? "bg-secondary"
+                      : i === currentScaleIdx
+                      ? "bg-secondary ring-2 ring-secondary/30"
+                      : "bg-muted"
+                  }`}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -103,7 +96,7 @@ const Index = () => {
               scenarios, and receive a personalised report.
             </p>
             <Button
-              onClick={() => setStep("scales")}
+              onClick={() => setStep("scale")}
               size="lg"
               className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-body font-semibold px-10"
             >
@@ -112,78 +105,47 @@ const Index = () => {
           </div>
         )}
 
-        {/* Scales */}
-        {step === "scales" && (
-          <div>
-            <div className="text-center mb-10">
-              <h2 className="font-display text-3xl font-bold text-foreground mb-3">
-                Place Yourself on Each Scale
-              </h2>
-              <p className="text-muted-foreground font-body">
-                Click or drag on each scale to mark where you think you fall.
-                Toggle country positions for reference.
-              </p>
-              <p className="text-sm text-secondary font-body mt-2 font-medium">
-                {completedScales} of {cultureScales.length} scales completed
-              </p>
-            </div>
-
-            {cultureScales.map((scale, i) => (
-              <CultureScale
-                key={scale.id}
-                scale={scale}
-                value={scaleValues[scale.id]}
-                onChange={(v) => handleScaleChange(scale.id, v)}
-                index={i}
-              />
-            ))}
-
-            <div className="flex justify-end mt-8">
+        {/* Scale + Scenarios (one at a time) */}
+        {step === "scale" && (
+          <div key={currentScale.id}>
+            <ScaleWithScenarios
+              scale={currentScale}
+              scaleValue={scaleValues[currentScale.id]}
+              onScaleChange={handleScaleChange}
+              scenarioResponses={scenarioResponses[currentScale.id] || []}
+              onScenarioChange={handleScenarioChange}
+              index={currentScaleIdx}
+              total={cultureScales.length}
+            />
+            <div className="flex justify-between mt-10">
               <Button
-                onClick={() => setStep("scenarios")}
-                disabled={completedScales < cultureScales.length}
+                onClick={handleBack}
+                variant="outline"
+                className="font-body"
+              >
+                ← Back
+              </Button>
+              <Button
+                onClick={handleNext}
+                disabled={!canProceed}
                 size="lg"
                 className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-body font-semibold px-10 disabled:opacity-40"
               >
-                Continue to Scenarios →
+                {currentScaleIdx < cultureScales.length - 1
+                  ? "Next Scale →"
+                  : "Get My Report →"}
               </Button>
             </div>
-            {completedScales < cultureScales.length && (
+            {!canProceed && (
               <p className="text-xs text-muted-foreground font-body text-right mt-2">
-                Complete all scales to continue
+                Place yourself on the scale to continue
               </p>
             )}
           </div>
         )}
 
-        {/* Scenarios */}
-        {step === "scenarios" && (
-          <div>
-            <ScenarioStep
-              responses={scenarioResponses}
-              onChange={handleScenarioChange}
-            />
-            <div className="flex justify-between mt-10">
-              <Button
-                onClick={() => setStep("scales")}
-                variant="outline"
-                className="font-body"
-              >
-                ← Back to Scales
-              </Button>
-              <Button
-                onClick={() => setStep("email")}
-                size="lg"
-                className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-body font-semibold px-10"
-              >
-                Get My Report →
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Email */}
-        {step === "email" && (
+        {/* Report */}
+        {step === "report" && (
           <div className="py-12">
             <EmailCapture
               scaleValues={scaleValues}
@@ -191,11 +153,14 @@ const Index = () => {
             />
             <div className="text-center mt-8">
               <Button
-                onClick={() => setStep("scenarios")}
+                onClick={() => {
+                  setCurrentScaleIdx(cultureScales.length - 1);
+                  setStep("scale");
+                }}
                 variant="ghost"
                 className="font-body text-muted-foreground"
               >
-                ← Back to Scenarios
+                ← Back to Scales
               </Button>
             </div>
           </div>
